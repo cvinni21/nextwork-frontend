@@ -1,0 +1,44 @@
+{
+  "area": [
+    "Tecnologia",
+    "Design",
+    "Marketing",
+    "Recursos Humanos",
+    "Administração",
+    "Finanças",
+    "Saúde",
+    "Educação",
+    "Engenharia",
+    "Jurídico"
+  ],
+  "seniority_level": [
+    "Estágio",
+    "Júnior",
+    "Pleno",
+    "Sênior",
+    "Especialista",
+    "Coordenador",
+    "Gerente",
+    "Diretor"
+  ],
+  "contract_type": [
+    "CLT",
+    "PJ",
+    "Estágio",
+    "Freelancer",
+    "Temporário",
+    "Voluntário"
+  ],
+  "modality": [
+    "Presencial",
+    "Remoto",
+    "Híbrido"
+  ],
+  "salary": [
+    "À combinar",
+    "Até R$2.000",
+    "R$2.000 - R$4.000",
+    "R$4.000 - R$6.000",
+    "Acima de R$6.000"
+  ]
+}

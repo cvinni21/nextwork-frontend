@@ -1,15 +1,25 @@
 'use client';
 import Head from "next/head";
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
-import api from "@/lib/api"
+import api from "@/lib/axiosInstance";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import Image from "next/image";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { ArrowBottomLeftIcon, CheckCircledIcon, LinkedInLogoIcon } from "@radix-ui/react-icons";
+import { ArrowRight, ArrowRightCircle } from "lucide-react";
+import { FaGoogle } from "react-icons/fa6";
+import { register, login } from "@/services/AuthService";
 
 export default function RegisterPage() {
   const [step, setStep] = useState(1);
   const [errors, setErrors] = useState({});
-  const [passwordMismatch, setPasswordMismatch] = useState(false);
+  const [generalError, setGeneralError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const [formData, setFormData] = useState({
     first_name: "",
@@ -26,9 +36,22 @@ export default function RegisterPage() {
 
   const router = useRouter();
 
+  const firstInputRef = useRef(null);
+  const courseInputRef = useRef(null);
+
+  useEffect(() => {
+    if (step === 1 && firstInputRef.current) {
+      firstInputRef.current.focus();
+    } else if (step === 2 && courseInputRef.current) {
+      courseInputRef.current.focus();
+    }
+  }, [step]);
+
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-    setErrors({ ...errors, [e.target.name]: null });
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+    setErrors(prevErrors => ({ ...prevErrors, [name]: null }));
+    setGeneralError('');
   };
 
   const validateStep1 = () => {
@@ -46,139 +69,227 @@ export default function RegisterPage() {
   };
 
   const handleNextStep = async () => {
-    if (!validateStep1()) return;
+    if (!formData.username.trim() || !formData.email.trim()) {
+      setErrors({
+        username: !formData.username.trim() ? ['Nome de usuário é obrigatório.'] : null,
+        email: !formData.email.trim() ? ['Email é obrigatório.'] : null,
+      });
+      return;
+    }
+
+    setLoading(true);
+    setGeneralError('');
 
     try {
-      const response = await api.post("validate-register/", {
+      console.log('Enviado para validação:', { username: formData.username, email: formData.email });
+      const response = await api.post('validate-register/', {
         username: formData.username,
         email: formData.email,
       });
-
       setStep(2);
     } catch (error) {
+      console.error('Erro na validação do back end: ', error.response?.data || error.message);
+
       if (error.response && error.response.data) {
         setErrors(error.response.data);
-
-        return;
+      } else {
+        setGeneralError('Erro inesperado na validação. Tente novamente mais tarde.');
       }
+    } finally {
+      setLoading(false);
     }
   };
+
+  const isStep1Valid =
+    formData.first_name.trim() !== '' &&
+    formData.last_name.trim() !== '' &&
+    formData.username.trim() !== '' &&
+    formData.email.trim() !== '' &&
+    formData.password.trim() !== '' &&
+    formData.confirm_password.trim() !== '' &&
+    formData.password === formData.confirm_password;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (step !== 2) {
-      return;
-    }
+    if (step !== 2) return;
+
+    setSubmitting(true);
+    setGeneralError("");
 
     try {
-      const fd = new FormData();
+      console.log("Dados enviados para cadastro:", formData);
+      await register(formData);
 
-      Object.entries(formData).forEach(([key, value]) => {
-        fd.append(key, value);
+      const loginResponse = await login({
+        email: formData.email,
+        password: formData.password,
       });
 
-      await api.post('register/', fd, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      });
+      localStorage.setItem('token', loginResponse.access);
+      localStorage.setItem('refreshToken', loginResponse.refresh);
 
       router.push('/curriculo');
     } catch (error) {
       if (error.response && error.response.data) {
         setErrors(error.response.data);
         setStep(1);
+      } else {
+        setGeneralError('Erro inesperado no cadastro. Tente novamente mais tarde.');
       }
+    } finally {
+      setSubmitting(false);
     }
-  };
+  }
 
   return (
-    <>
-      <div className="max-w-xl mx-auto mt-20 p-6 bg-white rounded-2xl shadow-md">
-        <h1 className="text-2xl font-semibold mb-6 text-center">Criar Conta</h1>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {step === 1 && ( // primeira parte 
-            <>
-              <div className="flex gap-4">
-                <Input
-                  name="first_name"
-                  placeholder="Nome"
-                  value={formData.first_name}
-                  onChange={handleChange}
-                  required
-                />
-                <Input
-                  name="last_name"
-                  placeholder="Sobrenome"
-                  value={formData.last_name}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-
-              <Input name="username" placeholder="Nome de Usuário" value={formData.username} onChange={handleChange} required />
-              {errors.username && <p className="text-red-500 text-sm">{errors.username[0]}</p>}
-              <Input name="email" type="email" placeholder="Email" value={formData.email} onChange={handleChange} required />
-              {errors.email && <p className="text-red-500 text-sm">{errors.email[0]}</p>}
-              <Input name="password" type="password" placeholder="Senha" value={formData.password} onChange={handleChange} required />
-              <Input name="confirm_password" type="password" placeholder="Confirmar Senha" value={formData.confirm_password} onChange={handleChange} required />
-              {errors.confirm_password && (
-                <p className="text-red-500 text-sm">{errors.confirm_password[0]}</p>
-              )}
-            </>
-          )}
-
-          {step === 2 && ( // segunda parte
-            <>
-              <Input
-                name="course"
-                placeholder="Formação"
-                value={formData.course}
-                onChange={handleChange}
-              />
-              <Input
-                name="skills"
-                placeholder="Habilidades (separadas por vírgulas)"
-                value={formData.skills}
-                onChange={handleChange}
-              />
-              <Input
-                name="linkedin"
-                placeholder="LinkedIn"
-                value={formData.linkedin}
-                onChange={handleChange}
-              />
-              <Input
-                name="github"
-                placeholder="GitHub"
-                value={formData.github}
-                onChange={handleChange}
-              />
-            </>
-          )}
-
-          <div className="flex justify-between pt-4">
-            {step > 1 && (
-              <Button type='button' onClick={() => setStep(step - 1)} variant='secondary' className='cursor-pointer'>
-                Voltar
-              </Button>
-            )}
-            {step < 2 ? (
-              <Button
-                type="button"
-                className='cursor-pointer'
-                onClick={handleNextStep}
-              >
-                Próximo
-              </Button>
-            ) : (
-              <Button type="submit" className='cursor-pointer'>Finalizar Cadastro</Button>
-            )}
-          </div>
-        </form>
+    <main className="h-screen flex w-full">
+      <div className="bg-blue-950 w-1/2 h-full flex flex-col justify-between p-16">
+        <div className="flex justify-center w-full">
+          <Carousel className='w-full max-w-xl'>
+            <CarouselContent>
+              {[1, 2, 3, 4].map((num) => (
+                <CarouselItem key={num}>
+                  <div className="flex aspect-square rounded p-8">
+                    <Image
+                      src={`/assets/work${num}.svg`}
+                      alt={`Ilustração ${num}`}
+                      width={500}
+                      height={500}
+                    />
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious />
+            <CarouselNext />
+          </Carousel>
+        </div>
+        <p className="text-center text-white mt-4">Dê o primeiro passo na sua carreira...</p>
       </div>
-    </>
+
+      <section className="flex items-center justify-center bg-white dark:bg-gray-900 h-full w-1/2 p-8">
+        <Card className='w-full max-w-md'>
+          <CardHeader>
+            <CardTitle className='text-2xl font-extrabold tracking-tighter text-blue-900 dark:text-blue-500'>
+              Crie sua conta!
+            </CardTitle>
+            <CardDescription>
+              Preencha os dados abaixo para se registrar:
+            </CardDescription>
+          </CardHeader>
+
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {step === 1 && (
+                <>
+                  <div className="flex gap-4">
+                    <div className="w-1/2 space-y-2">
+                      <Label htmlFor='first_name'>Nome</Label>
+                      <Input name='first_name' value={formData.first_name} placeholder='Ex: João...' onChange={handleChange} required ref={firstInputRef} />
+                      {errors.first_name && <p className="text-red-500 text-sm">{errors.first_name[0]}</p>}
+                    </div>
+                    <div className="w-1/2 space-y-2">
+                      <Label htmlFor='last_name'>Sobrenome</Label>
+                      <Input name='last_name' value={formData.last_name} placeholder='Ex: Silva...' onChange={handleChange} required />
+                      {errors.last_name && <p className="text-red-500 text-sm">{errors.last_name[0]}</p>}
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor='username'>Nome de Usuário</Label>
+                    <Input name='username' value={formData.username} placeholder='Ex: jbsilva123...' onChange={handleChange} required />
+                    {errors.username && <p className="text-red-500 text-sm">{errors.username[0]}</p>}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor='email'>Email</Label>
+                    <Input name='email' value={formData.email} placeholder='Ex: exemplo@gmail.com' onChange={handleChange} required />
+                    {errors.email && <p className="text-red-500 text-sm">{errors.email[0]}</p>}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor='password'>Senha</Label>
+                    <Input type='password' name='password' value={formData.password} placeholder='Ex: suasenha231' onChange={handleChange} required />
+                    {errors.password && <p className="text-red-500 text-sm">{errors.password[0]}</p>}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor='confirm_password'>Confirme sua senha</Label>
+                    <Input type='password' name='confirm_password' value={formData.confirm_password} placeholder='Ex: suasenha231' onChange={handleChange} required />
+                    {errors.confirm_password && <p className="text-red-500 text-sm">{errors.confirm_password[0]}</p>}
+                  </div>
+
+                  <Button 
+                    type='button' 
+                    className={`w-full cursor-pointer ${isStep1Valid ? 'bg-blue-900 dark:text-white' : 'bg-gray-400 cursor-not-allowed'}`} 
+                    disabled={loading} 
+                    onClick={handleNextStep}
+                  >
+                    Próximo
+                    <ArrowRightCircle />
+                  </Button>
+                </>
+              )}
+
+              {step === 2 && (
+                <>
+                  <div>
+                    <Label htmlFor='course'>Formação (opcional)</Label>
+                    <Input name='course' placeholder='Ex: Análise e Desenvolvimento de Sistemas...' value={formData.course} onChange={handleChange} ref={courseInputRef} className='mt-2' />
+                  </div>
+
+                  <div>
+                    <Label htmlFor='skills'>Habilidades (opcional)</Label>
+                    <Input name='skills' placeholder='Ex: Proativo, Python Básico' value={formData.skills} onChange={handleChange} className='mt-2'/>
+                  </div>
+
+                  <div>
+                    <Label htmlFor='linkedin'>LinkedIn (opcional)</Label>
+                    <Input name='linkedin' placeholder='Ex: linkedln.com/seuperfil' value={formData.linkedin} onChange={handleChange} className='mt-2'/>
+                  </div>
+
+                  <div>
+                    <Label htmlFor='github'>GitHub (opcional)</Label>
+                    <Input name='github' placeholder='Ex: github.com/seuperfil' value={formData.github} onChange={handleChange} className='mt-2'/>
+                  </div>
+
+                  <Button type='submit' className='w-full bg-blue-900 cursor-pointer dark:text-white'>
+                    Finalizar Cadastro
+                    <CheckCircledIcon />
+                  </Button>
+                </>
+              )}
+            </form>
+            {generalError && <p className="text-red-500 text-center">{generalError}</p>}
+          </CardContent>
+
+          <CardFooter className="flex flex-col gap-4">
+            <Button type='button' onClick={() => router.push('/login')} variant='outline' className='w-full cursor-pointer'>
+              Já tem uma conta?<p className="underline">Faça Login</p>
+            </Button>
+            <div className="flex items-center gap-4 w-full">
+              <div className="w-1/2">
+                <Button variant='outline' className='w-full flex justify-center gap-2 cursor-pointer'>
+                  <FaGoogle className="text-blue-900 w-4 h-4 dark:text-blue-500" />
+                  Google
+                </Button>
+              </div>
+              <div className="w-1/2">
+                <Button variant='outline' className='w-full flex justify-center gap-2 cursor-pointer'>
+                  <LinkedInLogoIcon className="text-blue-900 w-4 h-4 dark:text-blue-500" />
+                  LinkedIn
+                </Button>
+              </div>
+            </div>
+
+            <p className="text-muted-foreground text-center text-sm">
+              Ao se registrar, você concorda com nossos{" "}
+              <a className="text-blue-400 cursor-pointer underline">Termos de Uso e Privacidade</a>
+            </p>
+          </CardFooter>
+        </Card>
+      </section>
+    </main>
   )
 }

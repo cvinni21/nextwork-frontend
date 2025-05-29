@@ -10,9 +10,9 @@ import { LinkedInLogoIcon } from "@radix-ui/react-icons"
 import Image from "next/image"
 import { FaGoogle } from "react-icons/fa6"
 import { login } from "@/services/AuthService"
-import { setAuthToken } from "@/lib/api"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function LoginPage() {
     const router = useRouter();
@@ -21,21 +21,43 @@ export default function LoginPage() {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
 
+    const { setUser, setAccessToken, setRefreshToken } = useAuth()
+
+
+    function getUserIdFromToken(token) {
+        if (!token) return null;
+
+        try {
+            const base64Url = token.split('.')[1];
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            const jsonPayload = decodeURIComponent(
+                atob(base64)
+                .split('')
+                .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+                .join('')
+            );
+            const payload = JSON.parse(jsonPayload);
+            return payload.user_id || null;
+        } catch {
+            return null;
+        }
+    }
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
 
         try {
-            const data = await login({ email, password: password })
+            await login(
+                { email, password },
+                setUser,
+                setAccessToken,
+                setRefreshToken
+            );
 
-            localStorage.setItem('acessToken', data.access);
-            localStorage.setItem('refreshToken', data.refresh);
-
-            setAuthToken(data.access);
-
-            router.push('/');
+            router.push('/dashboard');
         } catch (err) {
-            setError("Credenciais Inválidas. Tente novamente.");
+            setError('Crendeciais inválidas. Tente novamente.')
             console.error(err);
         }
     }
@@ -66,10 +88,10 @@ export default function LoginPage() {
 
                 <p className="text-center text-white mt-4">Conectando você a novas oportunidades...</p>
             </div>
-            <section className="flex items-center justify-center bg-background h-full max-w-3xl w-1/2 p-4">
-                <Card className='w-full max-w-md'>
+            <section className="flex items-center justify-center bg-white dark:bg-gray-900 h-full w-1/2 p-8">
+                <Card className='w-full max-w-md shadow-xl'>
                     <CardHeader>
-                        <CardTitle className='text-2xl font-extrabold tracking-tighter text-blue-900'>
+                        <CardTitle className='text-2xl font-extrabold tracking-tighter text-blue-900 dark:text-blue-500'>
                             Entre com sua conta!
                         </CardTitle>
                         <CardDescription>
@@ -80,13 +102,13 @@ export default function LoginPage() {
                         <div className="flex items-center gap-4 mb-4">
                             <div className="w-1/2">
                                 <Button variant='outline' className='w-full flex justify-center gap-2 cursor-pointer'>
-                                    <FaGoogle className="text-blue-900 w-4 h-4" />
+                                    <FaGoogle className="text-blue-900 dark:text-blue-500 w-4 h-4" />
                                     Google
                                 </Button>
                             </div>
                             <div className="w-1/2">
                                 <Button variant='outline' className='w-full flex justify-center gap-2 cursor-pointer'>
-                                    <LinkedInLogoIcon className="text-blue-900 w-4 h-4" />
+                                    <LinkedInLogoIcon className="text-blue-900 dark:text-blue-500 w-4 h-4" />
                                     LinkedIn
                                 </Button>
                             </div>
@@ -103,7 +125,7 @@ export default function LoginPage() {
                                     htmlFor='email' 
                                     className='mb-2'
                                 >
-                                    Email
+                                    Email:
                                 </Label>
                                 <Input 
                                     id='email' 
@@ -130,7 +152,7 @@ export default function LoginPage() {
 
                             {error && <p className="text-red-600 mt-2">{error}</p>}
 
-                            <Button className='mt-6 w-full bg-blue-900 cursor-pointer'>
+                            <Button className='mt-6 w-full bg-blue-900 dark:bg-blue-600 cursor-pointer dark:text-white'>
                                 Entrar
                             </Button>
                         </form>
