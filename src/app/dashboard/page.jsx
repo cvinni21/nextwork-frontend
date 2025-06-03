@@ -39,12 +39,14 @@ export default function Jobs() {
   }
 
   return (
-    <div className="overflow-y-auto pb-10 bg-gray-100 dark:bg-gray-900 min-h-screen">
+    <div className="overflow-y-auto pb-10 bg-gray-100 dark:bg-gray-900 min-h-screen pt-30">
       <Header />
       <main className="max-w-6xl mx-auto px-4 mt-6">
 
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold">Vagas Disponiveis</h2>
+          <h2 className="text-xl font-semibold">
+            {jobs.length} {jobs.length === 1 ? 'Vaga disponível' : 'Vagas Disponíveis'}
+          </h2>
           <Button
             onClick={handleAddJobClick}
             className='bg-blue-600 text-white text-base px-4 py-2 rounded hover:bg-blue-700 dark:bg-blue-900 transition cursor-pointer'

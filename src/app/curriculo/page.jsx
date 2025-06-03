@@ -18,7 +18,7 @@ export default function CurriculoPage() {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const storedUser = localStorage.getItem('user');
-      const storedToken = localStorage.getItem('token'); // Defina o token aqui
+      const storedToken = localStorage.getItem('accessToken'); // Defina o token aqui
       console.log('storedToken', storedToken);
       if (!storedToken) {
         router.push('/login');
@@ -28,6 +28,7 @@ export default function CurriculoPage() {
       setLoading(false);
     }
   }, [router]);
+  
 
   if (loading) {
     return (
@@ -84,20 +85,20 @@ export default function CurriculoPage() {
               monte seu curriculo profissional em poucos minutos.
             </p>
             <Button className='dark:text-gray-200'>Criar Currículo</Button>
-          </CardContent>
-        </Card>
+        </CardContent>
+      </Card>
 
-        {/* Importar do Linkedln */}
-        <Card className='flex flex-col items-center text-center bg-gray-50 dark:bg-gray-800'>
-          <CardContent className='flex flex-col items-center justify-between p-6 h-full gap-2'>
-            <Link2 className='w-10 h-10 text-black dark:text-white mx-auto' />
-            <p className='mb-4 text-sm text-muted-foreground dark:text-gray-300'>
-              Caso já tenha um currículo do LinkedIn, você pode importá-lo automaticamente para agilizar o preenchimento.
-            </p>
-            <Button className='dark:text-gray-200'>Importar do LinkedIn</Button>
-          </CardContent>
-        </Card>
-      </div>
-    </section>
+      {/* Importar do Linkedln */}
+      <Card className='flex flex-col items-center text-center bg-gray-50 dark:bg-gray-800'>
+        <CardContent className='flex flex-col items-center justify-between p-6 h-full gap-2'>
+          <Link2 className='w-10 h-10 text-black dark:text-white mx-auto' />
+          <p className='mb-4 text-sm text-muted-foreground dark:text-gray-300'>
+            Caso já tenha um currículo do LinkedIn, você pode importá-lo automaticamente para agilizar o preenchimento.
+          </p>
+          <Button className='dark:text-gray-200'>Importar do LinkedIn</Button>
+        </CardContent>
+      </Card>
+    </div>
+    </section >
   )
 }

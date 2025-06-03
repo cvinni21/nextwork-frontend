@@ -73,42 +73,42 @@ export default function ProfileInfo() {
                     <h2 className="text-xl font-semibold">
                         {profile.first_name} {profile.last_name}
                     </h2>
-                    <p className="text-gray-600">{profile.course}</p>
+                    <p className="text-gray-600 dark:text-gray-400">{profile.course}</p>
                 </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
                 <div>
                     <Label>Nome</Label>
-                    <Input name='first_name' value={form.first_name} onChange={handleChange} />
+                    <Input name='first_name' value={form.first_name} onChange={handleChange} className='mt-2'/>
                 </div>
                 <div>
                     <Label>Sobrenome</Label>
-                    <Input name='last_name' value={form.last_name} onChange={handleChange} />
+                    <Input name='last_name' value={form.last_name} onChange={handleChange} className='mt-2'/>
                 </div>
             </div>
 
             <div>
                 <Label>Curso</Label>
-                <Input name='course' value={form.course} onChange={handleChange} /> 
+                <Input name='course' value={form.course} onChange={handleChange} className='mt-2'/> 
             </div>
 
             <div>
                 <Label>Habilidades</Label>
-                <Input name='skills' value={form.skills} onChange={handleChange} />
+                <Input name='skills' value={form.skills} onChange={handleChange} className='mt-2'/>
             </div>
 
             <div>
                 <Label>LinkedIn</Label>
-                <Input name='linkedin' value={form.linkedin} onChange={handleChange} /> 
+                <Input name='linkedin' value={form.linkedin} onChange={handleChange} className='mt-2'/> 
             </div>
 
             <div>
                 <Label>GitHub</Label>
-                <Input name='github' value={form.github} onChange={handleChange} />
+                <Input name='github' value={form.github} onChange={handleChange} className='mt-2'/>
             </div>
 
-            <Button type='submit' className='w-full'>
+            <Button type='submit' className='w-full dark:text-white'>
                 Salvar Alterações
             </Button>
         </form>

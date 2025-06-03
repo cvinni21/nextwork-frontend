@@ -22,7 +22,7 @@ export default function UploadCurriculum() {
     const { accessToken, refreshToken, setAccessToken, userId } = useAuth()
     const router = useRouter()
 
-    console.log(accessToken, userId, file) // tirar isso depois de testar o código
+    // console.log(accessToken, userId, file) colocar novamente se começarmos a ter erros 
 
     const loadCurriculum = async (tokenToUse) => {
         try {
@@ -81,7 +81,7 @@ export default function UploadCurriculum() {
         setUploading(true)
 
         try {
-            await uploadCurriculumWithAuth(userId, accessToken, refreshToken, file, setAccessToken)
+            await uploadCurriculumWithAuth(accessToken, refreshToken, file, setAccessToken)
             
             toast.success("Curriculo enviado com sucesso!")
             await loadCurriculum(accessToken)
@@ -99,7 +99,7 @@ export default function UploadCurriculum() {
 
     const handleDelete = async () => {
         try {
-            await deleteCurriculum(userId, accessToken);
+            await deleteCurriculum(accessToken);
             setCurriculumUrl(null);
             toast.success('Curriculo removido com sucesso!');
         } catch (error) {

@@ -22,15 +22,17 @@ export default function ProfileSidebar({ activeSection, onSelectSection }) {
     ];
 
     return (
-        <div className="w-64 h-full bg-white rounded-xl shadow p-4 flex flex-col justify-between">
+        <div className="w-64 h-full bg-white dark:bg-gray-800 rounded-xl shadow p-4 flex flex-col justify-between">
             <div className="space-y-1">
                 {items.map((item) => (
                     <button
                         key={item.key}
                         onClick={() => onSelectSection(item.key)}
                         className={clsx(
-                            "w-full text-left px-3 py-2 rounded-md text-sm hover:bg-muted cursor-pointer",
-                            activeSection === item.key && "bg-muted font-medium shadow-sm"
+                            "w-full text-left px-3 py-2 rounded-md text-sm cursor-pointer transition-colors",
+                            'focus:outline-none focus:ring-0',
+                            'hover:bg-gray-100 dark:hover:bg-gray-700',
+                            activeSection === item.key && "bg-gray-200 dark:bg-gray-700 font-medium shadow-sm"
                         )}
                     >
                         {item.label}

@@ -22,7 +22,7 @@ export default function ProfilePage() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
             <Header />
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 max-w-6xl mx-auto py-10 px-4">
@@ -30,7 +30,7 @@ export default function ProfilePage() {
                     <ProfileSidebar activeSection={activeSection} onSelectSection={setActiveSection} />
                 </aside>
 
-                <main className="md:col-span-3 bg-white rounded-xl shadow p-6 space-y-6">
+                <main className="md:col-span-3 bg-white dark:bg-gray-800 rounded-xl shadow dark:shadow-gray-700 p-6 space-y-6 transition-colors duration-300">
                     <div key={activeSection} className="animate-fade-in transition-opacity duration-300 ease-in-out">
                         {activeSection === 'info' && <ProfileInfo />}
                         {activeSection === 'password' && <ChangePasswordForm />}

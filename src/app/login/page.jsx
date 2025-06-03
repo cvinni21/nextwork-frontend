@@ -13,6 +13,7 @@ import { login } from "@/services/AuthService"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from '@/contexts/AuthContext';
+import { TermsDialog } from "@/components/TermsDialog"
 
 export default function LoginPage() {
     const router = useRouter();
@@ -162,7 +163,9 @@ export default function LoginPage() {
                         </Button>
                     </CardContent>
                     <CardFooter>
-                        <p className="text-muted-foreground text-center text-sm">Ao Entrar em nossa plataforma você concorda com nossos <a className="text-blue-400 cursor-pointer underline">Termos de Uso e Privacidade</a></p>
+                        <p className="text-muted-foreground text-center text-sm">
+                            Ao Entrar em nossa plataforma você concorda com nossos <TermsDialog />
+                        </p>
                     </CardFooter>
                 </Card>
             </section>

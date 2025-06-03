@@ -13,6 +13,8 @@ import { ArrowBottomLeftIcon, CheckCircledIcon, LinkedInLogoIcon } from "@radix-
 import { ArrowRight, ArrowRightCircle } from "lucide-react";
 import { FaGoogle } from "react-icons/fa6";
 import { register, login } from "@/services/AuthService";
+import { useAuth } from "@/contexts/AuthContext";
+import { TermsDialog } from "@/components/TermsDialog";
 
 export default function RegisterPage() {
   const [step, setStep] = useState(1);
@@ -35,6 +37,7 @@ export default function RegisterPage() {
   });
 
   const router = useRouter();
+  const { setUser, setAccessToken, setRefreshToken } = useAuth();
 
   const firstInputRef = useRef(null);
   const courseInputRef = useRef(null);
@@ -124,9 +127,9 @@ export default function RegisterPage() {
       const loginResponse = await login({
         email: formData.email,
         password: formData.password,
-      });
+      }, setUser, setAccessToken, setRefreshToken);
 
-      localStorage.setItem('token', loginResponse.access);
+      localStorage.setItem('accessToken', loginResponse.access);
       localStorage.setItem('refreshToken', loginResponse.refresh);
 
       router.push('/curriculo');
@@ -284,8 +287,7 @@ export default function RegisterPage() {
             </div>
 
             <p className="text-muted-foreground text-center text-sm">
-              Ao se registrar, você concorda com nossos{" "}
-              <a className="text-blue-400 cursor-pointer underline">Termos de Uso e Privacidade</a>
+              Ao se registrar, você concorda com nossos <TermsDialog />
             </p>
           </CardFooter>
         </Card>

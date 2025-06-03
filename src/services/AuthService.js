@@ -12,7 +12,7 @@ export const login = async (credentials, setUser, setAccessToken, setRefreshToke
     localStorage.setItem('refreshToken', refreshToken);
 
     const user = await getUserProfile(accessToken);
-    setUser(user); // ← aqui passa objeto, não string
+    setUser(user);
 
     setAccessToken(accessToken);
     setRefreshToken(refreshToken);

@@ -59,13 +59,13 @@ export default function SearchBar() {
   }
 
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-md shadow-md flex items-center px-2 py-1">
+    <div className="flex items-center px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white/70 dark:bg-gray-900/30 shadow-md backdrop-blur-md">
       <Input
         type="text"
         value={searchText}
         onChange={(e) => setSearchText(e.target.value)}
         placeholder="Pesquise uma vaga ou selecione uma cidade"
-        className="border-none focus:ring-0 focus-visible:ring-0 text-black dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400"
+        className="bg-transparent border-none focus:ring-0 focus-visible:ring-0 shadow-none text-black dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400"
       />
 
       <Popover>
@@ -141,7 +141,7 @@ export default function SearchBar() {
 
       <Button
         onClick={handleSearch}
-        className="ml-2 bg-blue-900 text-white hover:bg-blue-800"
+        className="ml-2 bg-blue-900/90 hover:bg-blue-900 text-white"
       >
         <MagnifyingGlassIcon className="w-4 h-4" />
         Buscar
