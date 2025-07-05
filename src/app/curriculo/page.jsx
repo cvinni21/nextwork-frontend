@@ -28,7 +28,7 @@ export default function CurriculoPage() {
       setLoading(false);
     }
   }, [router]);
-  
+
 
   if (loading) {
     return (
@@ -84,21 +84,30 @@ export default function CurriculoPage() {
               Preencha seus dados e<br />
               monte seu curriculo profissional em poucos minutos.
             </p>
-            <Button className='dark:text-gray-200'>Criar Currículo</Button>
-        </CardContent>
-      </Card>
+            <Button className='dark:text-gray-200' onClick={() => router.push('/curriculo/criar')}>
+              Criar Currículo
+            </Button>
+          </CardContent>
+        </Card>
 
-      {/* Importar do Linkedln */}
-      <Card className='flex flex-col items-center text-center bg-gray-50 dark:bg-gray-800'>
-        <CardContent className='flex flex-col items-center justify-between p-6 h-full gap-2'>
-          <Link2 className='w-10 h-10 text-black dark:text-white mx-auto' />
-          <p className='mb-4 text-sm text-muted-foreground dark:text-gray-300'>
-            Caso já tenha um currículo do LinkedIn, você pode importá-lo automaticamente para agilizar o preenchimento.
-          </p>
-          <Button className='dark:text-gray-200'>Importar do LinkedIn</Button>
-        </CardContent>
-      </Card>
-    </div>
+        {/* Importar do Linkedln */}
+        <Card className='flex flex-col items-center text-center bg-gray-50 dark:bg-gray-800'>
+          <CardContent className='flex flex-col items-center justify-between p-6 h-full gap-2'>
+            <Link2 className='w-10 h-10 text-black dark:text-white mx-auto' />
+            <p className='mb-4 text-sm text-muted-foreground dark:text-gray-300'>
+              Caso já tenha um currículo do LinkedIn, você pode importá-lo automaticamente para agilizar o preenchimento.
+            </p>
+            <Button className='dark:text-gray-200'>Importar do LinkedIn</Button>
+          </CardContent>
+        </Card>
+      </div>
+      <Button
+        variant='outline'
+        className='mt-6 dark:text-gray-400'
+        onClick={() => router.push('/')}
+      >
+        Enviar Currículo Depois
+      </Button>
     </section >
   )
 }

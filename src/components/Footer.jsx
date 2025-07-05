@@ -12,11 +12,13 @@ const Footer = () => {
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center md:items-start gap-6 pb-8">
         {/* Logo */}
         <div className="flex-shrink-0">
-          <img
-            src="/assets/LogoNextWork.png"
-            alt="Logo NextWork"
-            className="h-12 w-auto object-contain"
-          />
+          <Link href='/'>
+            <img
+              src="/assets/LogoNextWork.png"
+              alt="Logo NextWork"
+              className="h-12 w-auto object-contain cursor-pointer"
+            />
+          </Link>
         </div>
 
         {/* Navegação central */}

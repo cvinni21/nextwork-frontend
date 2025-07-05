@@ -3,14 +3,18 @@ import api from "@/lib/axiosInstance";
 export const fetchJobs = async (filters = {}) => {
     const params = new URLSearchParams();
 
-    if (filters.search?.trim()) params.set('search', filters.search.trim());
-    if (filters.local?.trim()) params.set('local', filters.local.trim());
+    Object.entries(filters).forEach(([key, val]) => {
+        if (val !== undefined && val !== null && val !== '') {
+            params.set(key, val)
+        }
+    })
 
     const query = params.toString();
     const url = query ? `jobs/?${query}` : 'jobs/';
 
     const response = await api.get(url);
-    return response.data;
+
+    return { data: response.data, total: response.data.length };
 }
 
 export const createJob = async (jobData) => {

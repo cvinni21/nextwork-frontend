@@ -58,7 +58,6 @@ const JobCard = ({
             onClick={handleClick}
             className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:shadow-md dark:hover:bg-gray-900 rounded-lg p-4 transition w-full max-w-6xl flex gap-6 items-start cursor-pointer"
         >
-            {/* Logo fixa à esquerda */}
             <div className="flex-shrink-0 w-20 h-20 flex items-center justify-center bg-gray-100 dark:bg-gray-700 rounded">
                 {company_logo ? (
                     <img
@@ -73,7 +72,6 @@ const JobCard = ({
                 )}
             </div>
 
-            {/* Informações ao lado da logo */}
             <div className="flex flex-col flex-grow">
                 <div className="flex justify-between items-start">
                     <div>

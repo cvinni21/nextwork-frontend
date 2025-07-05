@@ -86,8 +86,13 @@ export default function NovaVaga() {
             await createJob(data)
             router.push('/dashboard')
         } catch (err) {
-            console.error('Erro ao cadastrar a vaga:', err)
-            alert('Erro ao cadastrar vaga')
+            if (err.response) {
+                console.error('Erro ao cadastrar vaga:', err.response.data)
+                alert(`Erro ao cadastrar vaga: ${JSON.stringify(err.response.data)}`)
+            } else {
+                console.error('Erro ao cadastrar vaga:', err)
+                alert('Erro ao cadastrar vaga')
+            }
         }
     }
 

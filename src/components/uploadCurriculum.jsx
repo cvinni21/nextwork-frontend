@@ -5,8 +5,7 @@ import { Upload, X } from "lucide-react"
 import { Button } from "./ui/button"
 import { Input } from "./ui/input"
 import { toast } from "sonner"
-import { deleteCurriculum, fetchCurriculum } from "@/services/curriculumService"
-import { uploadCurriculumWithAuth } from "@/services/Curriculum"
+import { deleteCurriculum, fetchCurriculum, uploadCurriculum } from "@/services/curriculumService"
 import { Label } from "./ui/label"
 import { useAuth } from "@/contexts/AuthContext"
 import { CrossCircledIcon } from "@radix-ui/react-icons"
@@ -26,7 +25,7 @@ export default function UploadCurriculum() {
 
     const loadCurriculum = async (tokenToUse) => {
         try {
-            const url = await fetchCurriculum(userId, tokenToUse)
+            const url = await fetchCurriculum()
             setCurriculumUrl(url);
         } catch (error) {
             if (error.response?.status === 404) {
@@ -81,7 +80,7 @@ export default function UploadCurriculum() {
         setUploading(true)
 
         try {
-            await uploadCurriculumWithAuth(accessToken, refreshToken, file, setAccessToken)
+            await uploadCurriculum(file)
             
             toast.success("Curriculo enviado com sucesso!")
             await loadCurriculum(accessToken)
@@ -99,7 +98,7 @@ export default function UploadCurriculum() {
 
     const handleDelete = async () => {
         try {
-            await deleteCurriculum(accessToken);
+            await deleteCurriculum();
             setCurriculumUrl(null);
             toast.success('Curriculo removido com sucesso!');
         } catch (error) {

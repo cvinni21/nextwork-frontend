@@ -3,7 +3,7 @@ import "./styles/globals.css"
 import { Toaster } from "sonner"
 import { AuthProvider } from "@/contexts/AuthContext"
 import { ThemeProvider } from "@/components/themeProvider"
-import ThemeToggle from "@/components/ThemeToggle"
+import RouterProgress from "@/components/RouterProgress"
 import VLibrasClient from "@/components/VLibrasClient"
 import LayoutWrapper from "@/components/LayoutWrapper"
 
@@ -28,6 +28,7 @@ export default function RootLayout({ children }) {
       <body style={{ fontFamily: "'DM Sans', sans-serif" }}>
         <ThemeProvider>
           <AuthProvider>
+            <RouterProgress />
             <LayoutWrapper>{children}</LayoutWrapper>
             <VLibrasClient />
             <Toaster richColors />

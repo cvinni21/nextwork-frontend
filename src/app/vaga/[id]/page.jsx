@@ -20,6 +20,7 @@ export default function JobDetail() {
     const fetchJob = async () => {
         try {
             const response = await axios.get(`${API_URL}jobs/${id}/`)
+            console.log('Dados da vaga:', response.data)
             setJob(response.data)
         } catch (error) {
             console.error('Erro ao carregar a vaga:', error)

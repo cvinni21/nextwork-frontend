@@ -15,6 +15,7 @@ import { FaGoogle } from "react-icons/fa6";
 import { register, login } from "@/services/AuthService";
 import { useAuth } from "@/contexts/AuthContext";
 import { TermsDialog } from "@/components/TermsDialog";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export default function RegisterPage() {
   const [step, setStep] = useState(1);
@@ -34,6 +35,7 @@ export default function RegisterPage() {
     skills: "",
     linkedin: "",
     github: "",
+    acceptedTerms: false,
   });
 
   const router = useRouter();
@@ -51,8 +53,8 @@ export default function RegisterPage() {
   }, [step]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    const { name, type, checked, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
     setErrors(prevErrors => ({ ...prevErrors, [name]: null }));
     setGeneralError('');
   };
@@ -116,6 +118,11 @@ export default function RegisterPage() {
     e.preventDefault();
 
     if (step !== 2) return;
+
+    if (!formData.acceptedTerms) {
+      setErrors({ acceptedTerms: ['Você precisa aceitar os termos para continuar.'] });
+      return;
+    }
 
     setSubmitting(true);
     setGeneralError("");
@@ -223,10 +230,10 @@ export default function RegisterPage() {
                     {errors.confirm_password && <p className="text-red-500 text-sm">{errors.confirm_password[0]}</p>}
                   </div>
 
-                  <Button 
-                    type='button' 
-                    className={`w-full cursor-pointer ${isStep1Valid ? 'bg-blue-900 dark:text-white' : 'bg-gray-400 cursor-not-allowed'}`} 
-                    disabled={loading} 
+                  <Button
+                    type='button'
+                    className={`w-full cursor-pointer ${isStep1Valid ? 'bg-blue-900 dark:text-white' : 'bg-gray-400 cursor-not-allowed'}`}
+                    disabled={loading}
                     onClick={handleNextStep}
                   >
                     Próximo
@@ -244,20 +251,41 @@ export default function RegisterPage() {
 
                   <div>
                     <Label htmlFor='skills'>Habilidades (opcional)</Label>
-                    <Input name='skills' placeholder='Ex: Proativo, Python Básico' value={formData.skills} onChange={handleChange} className='mt-2'/>
+                    <Input name='skills' placeholder='Ex: Proativo, Python Básico' value={formData.skills} onChange={handleChange} className='mt-2' />
                   </div>
 
                   <div>
                     <Label htmlFor='linkedin'>LinkedIn (opcional)</Label>
-                    <Input name='linkedin' placeholder='Ex: linkedln.com/seuperfil' value={formData.linkedin} onChange={handleChange} className='mt-2'/>
+                    <Input name='linkedin' placeholder='Ex: linkedln.com/seuperfil' value={formData.linkedin} onChange={handleChange} className='mt-2' />
                   </div>
 
                   <div>
                     <Label htmlFor='github'>GitHub (opcional)</Label>
-                    <Input name='github' placeholder='Ex: github.com/seuperfil' value={formData.github} onChange={handleChange} className='mt-2'/>
+                    <Input name='github' placeholder='Ex: github.com/seuperfil' value={formData.github} onChange={handleChange} className='mt-2' />
                   </div>
 
-                  <Button type='submit' className='w-full bg-blue-900 cursor-pointer dark:text-white'>
+                  <div className="flex items-center space-x-2 mt-4">
+                    <Checkbox
+                      id='acceptedTerms'
+                      name='acceptedTerms'
+                      checked={formData.acceptedTerms}
+                      onCheckedChange={(checked) => {
+                        setFormData(prev => ({ ...prev, acceptedTerms: checked || false }));
+                        setErrors(prev => ({ ...prev, acceptedTerms: null }));
+                      }}
+                    />
+                    <Label htmlFor='acceptedTerms' className='cursor-pointer selected-none text-sm'>
+                      Eu aceito os <TermsDialog />
+                    </Label>
+                  </div>
+
+                  {errors.acceptedTerms && <p className="text-red-500 text-sm mt-1">{errors.acceptedTerms[0]}</p>}
+
+                  <Button
+                    type='submit'
+                    className='w-full bg-blue-900 cursor-pointer dark:text-white'
+                    disabled={!formData.acceptedTerms || submitting}
+                  >
                     Finalizar Cadastro
                     <CheckCircledIcon />
                   </Button>

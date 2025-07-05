@@ -10,18 +10,22 @@ import FilterSideBar from "@/components/FilterSideBar"
 import { Button } from "@/components/ui/button"
 import { PlusCircledIcon } from "@radix-ui/react-icons"
 import LoadingSpinner from "@/components/LoadingSpinner"
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationPrevious, PaginationNext } from "@/components/ui/pagination"
+
+const ITEMS_PER_PAGE = 5
 
 export default function Jobs() {
   const [jobs, setJobs] = useState([])
   const [loadingPage, setLoadingPage] = useState(false)
+  const [page, setPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
   const router = useRouter()
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    const search = searchParams.get('search') || '';
-    const local = searchParams.get('local') || '';
-    loadJobs({ search, local });
-  }, [searchParams.toString()]);
+    const filters = Object.fromEntries([...searchParams.entries()]);
+    loadJobs(filters, page);
+  }, [searchParams.toString(), page]);
 
 
   const handleAddJobClick = () => {
@@ -29,13 +33,28 @@ export default function Jobs() {
     router.push('/nova-vaga')
   }
 
-  const loadJobs = async (filters = {}) => {
+  const loadJobs = async (filters = {}, currentPage = 1) => {
     try {
-      const data = await fetchJobs(filters)
-      setJobs(data)
+      const filtersWithPagination = {
+        ...filters,
+        page: currentPage,
+        limit: ITEMS_PER_PAGE,
+      }
+
+      const response = await fetchJobs(filtersWithPagination)
+      console.log('Resposta Bruta da API:', response)
+
+      const { data, total } = response
+
+      setJobs(Array.isArray(data) ? data : [])
+      setTotalPages(Math.ceil((total ?? 0) / ITEMS_PER_PAGE))
     } catch (err) {
       console.error('Erro ao buscar vagas:', err)
     }
+  }
+
+  const handlePageChange = (newPage) => {
+    setPage(newPage)
   }
 
   return (
@@ -64,7 +83,7 @@ export default function Jobs() {
             {jobs.length > 0 ? (
               jobs.map((job) => (
                 <JobCard
-                  id={job.id} 
+                  id={job.id}
                   key={job.id}
                   title={job.title}
                   company_logo={job.company_logo}
@@ -80,6 +99,41 @@ export default function Jobs() {
               ))
             ) : (
               <p>Nenhuma vaga disponível no momento.</p>
+            )}
+
+            {totalPages > 1 && (
+              <Pagination>
+                <PaginationContent>
+
+                  {page > 1 && (
+                    <PaginationItem>
+                      <PaginationPrevious href='#' onClick={() => handlePageChange(page - 1)} />
+                    </PaginationItem>
+                  )}
+
+                  {Array.from({ length: totalPages }).map((_, index) => {
+                    const pageNumber = index + 1
+                    return (
+                      <PaginationItem key={pageNumber}>
+                        <PaginationLink
+                          href="#"
+                          isActive={pageNumber === page}
+                          onClick={() => handlePageChange(pageNumber)}
+                        >
+                          {pageNumber}
+                        </PaginationLink>
+                      </PaginationItem>
+                    )
+                  })}
+                  
+                  {page < totalPages && (
+                    <PaginationItem>
+                      <PaginationNext href='#' onClick={() => handlePageChange(page + 1)} />
+                    </PaginationItem>
+                  )}
+
+                </PaginationContent>
+              </Pagination>
             )}
           </div>
         </div>

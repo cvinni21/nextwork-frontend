@@ -3,13 +3,9 @@ import API_URL from "@/lib/apiKey";
 import BACKEND_BASE_URL from "@/lib/backBaseUrl";
 import api from "@/lib/axiosInstance";
 
-export async function fetchCurriculum(token) {
+export async function fetchCurriculum() {
     try {
-        const response = await api.get(`users/me/curriculum/`, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
+        const response = await api.get(`users/me/curriculum/`);
         const url = response.data.curriculum;
 
         if (url.startsWith('http://') || url.startsWith('https://')) {
@@ -25,54 +21,61 @@ export async function fetchCurriculum(token) {
     }
 }
 
-export async function uploadCurriculum(token, file) {
+export async function uploadCurriculum(file) {
     const formData = new FormData();
     formData.append('file', file);
 
-    const response = await axios.put(`${API_URL}users/me/curriculum/`, formData, {
+    const response = await api.put('users/me/curriculum/', formData, {
         headers: {
             "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${token}`
         },
     });
 
     return response.data;
 }
 
-export async function deleteCurriculum(userId, token) {
-    const response = await axios.delete(`${API_URL}users/me/curriculum/`, {
-        headers: {
-            Authorization: `Bearer ${token}`
-        },
-    });
-
+export async function deleteCurriculum() {
+    const response = await api.delete('users/me/curriculum/');
     return response.data;
 }
 
-export async function createFullCurriculum(curriculoData, accessToken) {
-    const response = await axios.post(`${API_URL}users/me/curriculum/create/`, curriculoData, {
-        headers: {
-            Authorization: `Bearer ${accessToken}`,
-            'Content-Type': 'application/json'
-        },
-    });
-
-    return response.data;
-}
-
-export async function setUserCurriculum(data, token) {
-    const response = await fetch('/api/curriculo/usuario', {
-        method: 'POST',
+export async function createFullCurriculum(curriculoData) {
+    const response = await api.post('users/me/curriculum/create/', curriculoData, {
         headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
+        },
+    });
+
+    return response.data;
+}
+
+export async function setUserCurriculum(data) {
+    const response = await fetch("/api/curriculo/usuario", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
     });
 
     if (!response.ok) {
-        throw new Error('Erro ao definir o currículo do usuário');
+        throw new Error("Erro ao definir o currículo do usuário");
     }
 
     return response.json();
+}
+
+export async function generateCurriculumPDF() {
+    try {
+        const response = await api.get(`users/me/curriculum/pdf/`, {
+            responseType: 'blob',
+        });
+
+        const blob = new Blob([response.data], { type: 'application/pdf' });
+        const url = window.URL.createObjectURL(blob);
+        window.open(url, '_blank');
+    } catch (error) {
+        console.error('Erro ao gerar currículo PDF:', error);
+        throw error;
+    }
 }
