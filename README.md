@@ -52,7 +52,7 @@ A proposta do NextWork é oferecer uma experiência simples e intuitiva para bus
 
 ### **1. Clone o repositório**
 ```bash
-git clone <url-do-repositorio>
+git clone https://github.com/cvinni21/nextwork-frontend.git
 cd nextwork
 ```
 
