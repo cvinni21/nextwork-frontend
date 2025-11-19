@@ -8,24 +8,20 @@ import VLibrasClient from "@/components/VLibrasClient"
 import LayoutWrapper from "@/components/LayoutWrapper"
 
 export const metadata = {
-  title: 'NextWork',
+  title: "NextWork",
   icons: {
-    icon: '/icon.svg',
+    icon: "/icon.svg",
   },
 }
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="pt-BR">
+    <html lang="pt-BR" suppressHydrationWarning>
       <head>
         <link rel="icon" href="/icon.svg" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=DM+Sans&display=swap"
-          rel="stylesheet"
-        />
         <title>{metadata.title}</title>
       </head>
-      <body style={{ fontFamily: "'DM Sans', sans-serif" }}>
+      <body>
         <ThemeProvider>
           <AuthProvider>
             <RouterProgress />
